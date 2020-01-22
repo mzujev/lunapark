@@ -1,5 +1,5 @@
 # Lunopark
-____
+
 ***Lunopark*** is a suite of software solutions, that acts as a combination of two roles(FastAGI/AMI) in the same execution space.
 That meen, we can execute dialplan applications and receive(proccess) AMI events in one same runtime space and in coopiration with each other.
 ***Lunopark*** is asyncronous(based on coroutine) service, that feature mast be considered when make up the future configuration.
