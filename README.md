@@ -165,4 +165,4 @@ To install ***Lunopark*** use `git clone` and manually resolve the dependencies.
 - [md5](https://github.com/keplerproject/md5) - MD5 algorithm implementation
 
 ### Copyright
-See [Copyright.txt](https://github.com/mzujev/lunopark/Copyright.txt) file for details
+See [Copyright.txt](https://github.com/mzujev/lunopark/blob/master/Copyright.txt) file for details
