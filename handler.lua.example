@@ -1,0 +1,54 @@
+-- Receive current channels status
+local status = ami.Status()
+
+-- Receive Codec translation
+local stuff = ami.command{command = 'core show translation'}
+
+-- Redirect some(not necessarily current) channel
+local status = ami.redirect{
+	channel = 'SIP/1-0000012c',
+	context = 'transfer',
+	exten = 's',
+	priority = 1
+}
+
+-- Get Global Variable
+local var = ami.getvar {variable = 'TEST'}
+
+-- Get variable of some channel
+local cvar = ami.getvar {
+	variable = 'CHANNEL',
+	channel = 'SIP/1-0000012c'
+}
+
+-- Add event-listener
+ami.addEvent('hangup', function(e) print(e['Channel'] .. ' is ' .. e['Event']))
+
+--		OR
+
+ami.addEvents{
+	['Hangup'] = function(e)
+		print(e['Channel'] .. ' is ' .. e['Event'])
+	end,
+	['Answer'] == function(e)
+		print(e['Channel'] .. ' is ' .. e['Event'])
+	end
+}
+
+
+-- Processing all new calls
+function subroutine(...)
+	local pin
+	local app, channel = ...
+	
+	app.Answer()
+	app.Read('PIN','beep',_,_,_,8)
+	pin = channel.get('PIN')
+	app.Verbose('User entered ' .. pin)
+	
+	if pin ~= '0000' then
+		app.Vebose('Wrong pin code ...') return
+	end
+	
+	app.Dial('SIP/trunk/1234',120,'gr')
+end

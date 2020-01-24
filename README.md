@@ -81,7 +81,7 @@ The AMI role creates a global ***ami*** object, that allows execute an AMI comma
     }
 
     -- Add event-listener
-    ami.addEvent(hangup,function(e) print(e['Channel'] .. ' is ' .. e['Event']))
+    ami.addEvent('hangup',function(e) print(e['Channel'] .. ' is ' .. e['Event']))
     --        OR
     ami.addEvents{
         ['Hangup'] = function(e)
@@ -98,52 +98,52 @@ The AMI role creates a global ***ami*** object, that allows execute an AMI comma
 
 *Example:*
 ```lua
--- (String)              
--- Role of daemon        
--- Can be 'both','agi' or 'ami'
-role = 'both'            
+	-- (String)              
+	-- Role of daemon        
+	-- Can be 'both','agi' or 'ami'
+	role = 'both'            
 
--- (String)              
--- User for AMI connection
-user = 'admin'           
+	-- (String)              
+	-- User for AMI connection
+	user = 'admin'           
 
--- (String)
--- Secret for AMI connection 
-secret = 'secret'      
+	-- (String)
+	-- Secret for AMI connection 
+	secret = 'secret'      
 
--- (String)
--- Address for AMI server
--- Can be of the form 'ip:port' or 'ip'
-host = '127.0.0.1'
+	-- (String)
+	-- Address for AMI server
+	-- Can be of the form 'ip:port' or 'ip'
+	host = '127.0.0.1'
 
--- (String)
--- Listen address for AGI server
--- Can be of the form '*' | 'ip' | '*:port' | 'ip:port'
-listen = '*'             
+	-- (String)
+	-- Listen address for AGI server
+	-- Can be of the form '*' | 'ip' | '*:port' | 'ip:port'
+	listen = '*'             
 
--- (String)
--- Path to the file that contains the processing logic
-handler = '/etc/lunopark/handler.lua'
+	-- (String)
+	-- Path to the file that contains the processing logic
+	handler = '/etc/lunopark/handler.lua'
 
--- (String)
--- Log message identifier
-ident = 'lunopark'
+	-- (String)
+	-- Log message identifier
+	ident = 'lunopark'
 
--- (String)
--- Log file location
--- If not set then used only console output
-log = '/tmp/lunopark.log'
+	-- (String)
+	-- Log file location
+	-- If not set then used only console output
+	log = '/tmp/lunopark.log'
 ```
 
 ### Usage
 To start the ***Lunopark*** service just need to specify the configuration file.
 
 ```sh
-$ lunopark -c /etc/lunopark/lunopark.conf
+	lunopark -c /etc/lunopark/lunopark.conf
 ```
 If configuration file not specifyed then will be used default values, also ***Lunopark*** has't background mode, if you need to run in background mode uses the capabilities of the command shell.
 ```sh
-$ lunopark -c /etc/lunopark/lunopark.conf &>/dev/null &
+	lunopark -c /etc/lunopark/lunopark.conf &>/dev/null &
 ```
 
 The ***Lunopark*** can accepted the `HUP` and `QUIT` signals. When a `HUP`/`QUIT` is received, then ***Lunopark*** re-load a handler file.
@@ -152,8 +152,8 @@ The ***Lunopark*** can accepted the `HUP` and `QUIT` signals. When a `HUP`/`QUIT
 To install ***Lunopark*** use `git clone` and manually resolve the dependencies.
 
 ```sh
-# mkdir -p /etc/lunopark && cd /etc/lunopark
-# git clone https://github.com/mzujev/lunopark
+	mkdir -p /etc/lunopark && cd /etc/lunopark
+	git clone https://github.com/mzujev/lunopark
 ```
 
 ### Dependencies
