@@ -348,7 +348,7 @@ function AMI.addEvent(self,...)
 	-- Check if this event is already being processed
 	if self.events[pattern] then
 		if type(func) == 'function' then
-			-- Transform 'pattern' in to array if any
+			-- Transform 'pattern' in to array if not already
 			if type(self.events[pattern]) ~= 'table' then
 				self.events[pattern] = { self.events[pattern] }
 			end
@@ -360,7 +360,7 @@ function AMI.addEvent(self,...)
 	else
 		if type(func) == 'function' then
 			-- Add callback function to patterns array
-			self.events[pattern] = func return 1 -- Return assigned index from patterns array
+			self.events[pattern] = {[i or 1] = func} return i or 1 -- Return assigned index from patterns array
 		end
 	end
 end
@@ -388,14 +388,14 @@ function AMI.addEvents(self,...)
 end
 
 -- Remove previously defined callback function for some event and by some index
--- Syntrax like: ami:removeEvent(pattern,index)
+-- Syntax like: ami:removeEvent(pattern,index)
 --	pattern: Event pattern(Hangup,Answer, etc)
 --	index: Index inside callback patterns array
 function AMI.removeEvent(self,...)
 	-- Checking the structure of the Callbacks Table
 	if type(self['events']) ~= 'table' then return self.logger('Callbacks table is malformed') end
 
-	local pattern,index = ...
+	local pattern, index = (function(...) local p,i = ... return string.lower(p),i end)(...)
 	-- Check if this event pattern is being defined
 	if self.events[pattern] then
 		-- If pattern is array
@@ -424,15 +424,29 @@ function AMI.removeEvents(self,...)
 	-- Checking the structure of the Callbacks Table
 	if type(self['events']) ~= 'table' then return self.logger('Callbacks table is malformed') end
 	-- Prepare/Parse of input parameters
+	
 	for _,p in ipairs({...} or {}) do
 		local pattern = string.lower(p)
 		-- Seems like a complete cleanup
 		if pattern == '*' then
-			self.events = {} return
-		end
-		-- Cleanup some event pattern
-		if self.events[pattern] then
-			self.events[pattern] = nil
+			-- Loop is needed because we are not wont delete 'hidden' events from completely cleanup
+			for i, t in pairs(self.events) do
+				-- Pattern of event is table
+				if type(t) == 'table' then
+					-- Delete only functions with a numerical index in the array
+					for k,v in ipairs(t) do
+						t[k] = nil
+					end
+				else
+					-- Pattern not table, just delete him
+					self.events[i] = nil
+				end
+			end
+		else
+			-- Cleanup some event pattern
+			if self.events[pattern] then
+				self.events[pattern] = nil
+			end
 		end
 	end
 end
