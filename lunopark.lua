@@ -629,7 +629,9 @@ local sessions_request = function(...)
 		end	
 
 		-- Move next only if user defined scriptname exist inside AGI area
-		if type(harea) == "table" and type(harea[scriptname]) == "function" then
+		-- IMPORTANT
+		--	The scriptname not should definitely be inside the global scope
+		if not _G[scriptname] and type(harea) == "table" and type(harea[scriptname]) == "function" then
 			-- Pre-define new event-driven listener(coroutine)
 			local thread
 			-- Local copy of user-defined script
@@ -707,6 +709,13 @@ local sessions_request = function(...)
 							},
 							{__index = session.headers}
 						)
+					)
+
+					-- Create an appropriate event when the AGI script has ended
+					chan.UserEvent('AGIStatus',
+						('Script: %s'):format(scriptname), -- User defined scriptname
+						('Channel: %s'):format(chan.get('CHANNEL')), -- Current channel
+						('Status: %s'):format(chan.get('AGISTATUS')) -- Executiom status of an AGI script
 					)
 
 					-- End of, stop/free all no needed any more object
