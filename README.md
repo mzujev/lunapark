@@ -9,7 +9,7 @@ In general, Lunopark is a replacement of Asterisk REST Interface, but in some pl
 - ***Lunopark*** Asynchronous (based on coroutine)
 - Functionality for FastAGI role
 - Functionality for AMI role
-- Compatible with Lua 5.1, 5.2, 5.3 and ***LuaJIT***
+- Compatible with Lua 5.1, 5.2, 5.3 and [LuaJIT](http://luajit.org/)
 
 #### AGI Role
 The FastAGI implementation it's a classic AGI server that acts as call processing service.
