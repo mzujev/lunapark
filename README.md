@@ -1,12 +1,12 @@
-# Lunopark
+# Lunapark
 
-***Lunopark*** is a suite of software solutions, that acts as a combination of two roles(FastAGI/AMI) in the same execution space.
+***Lunapark*** is a suite of software solutions, that acts as a combination of two roles(FastAGI/AMI) in the same execution space.
 That meen, we can execute dialplan applications and receive(proccess) AMI events in one same runtime space and in coopiration with each other.
-***Lunopark*** is asyncronous(based on coroutine) service, that feature mast be considered when make up the future configuration.
-In general, Lunopark is a replacement of Asterisk REST Interface, but in some places it is more flexible.
+***Lunapark*** is asyncronous(based on coroutine) service, that feature mast be considered when make up the future configuration.
+In general, Lunapark is a replacement of Asterisk REST Interface, but in some places it is more flexible.
 
 ### Features
-- ***Lunopark*** Asynchronous (based on coroutine)
+- ***Lunapark*** Asynchronous (based on coroutine)
 - Functionality for FastAGI role
 - Functionality for AMI role
 - Compatible with Lua 5.1, 5.2, 5.3 and [LuaJIT](http://luajit.org/)
@@ -15,8 +15,8 @@ In general, Lunopark is a replacement of Asterisk REST Interface, but in some pl
 The FastAGI implementation it's a classic AGI server that acts as call processing service.
 In the simple case, if we want to handle calls using the AGI Role, that we hands over control of a channel from Asterisk to the FastAGI subroutine.
 The AGI Role is similar the ***pbx_lua.so*** with some syntax changes:
-- ***pbx_lua.so*** contains all configuration in global table ***extensions***, while ***Lunopark*** can stores the configuration everywhere you wish.
-- ***pbx_lua.so*** passes in to extension function the current context and extension as the first two arguments, while ***Lunopark*** passes the ***app*** and ***channel*** objects respectively.
+- ***pbx_lua.so*** contains all configuration in global table ***extensions***, while ***Lunapark*** can stores the configuration everywhere you wish.
+- ***pbx_lua.so*** passes in to extension function the current context and extension as the first two arguments, while ***Lunapark*** passes the ***app*** and ***channel*** objects respectively.
 - ***pbx_lua.so*** can't store persistent variables(database connection/globally shared objects), instead that, the library does this every time with each next call is processed. The AGI Role devoid of this disadvantage.
 - And the most important is what AGI Role has access to the global ***ami*** object in any place of execution. This coopiration allows us to receive the global state or the status of other calls in the system within the AGI execution.
 
@@ -25,7 +25,7 @@ The AGI Role is similar the ***pbx_lua.so*** with some syntax changes:
     ;extensions.conf
     [user_context]
     exten => _.,1,Goto(main)
-    ;Pass call control to the lunopark
+    ;Pass call control to the lunapark
     exten => _.,100(main),AGI(agi://ip_addres_of_agi_role/subroutine)
     exten => _[hit],1,NoOp()
 ```
@@ -94,7 +94,7 @@ The AMI role creates a global ***ami*** object, that allows execute an AMI comma
 ```
 
 ### Configuration
-***Lunopark*** is only configured using a configuration file that has the correct lua syntax. The ***Lunopark*** service has only one command line switch `-c`, which points to a configuration file.
+***Lunapark*** is only configured using a configuration file that has the correct lua syntax. The ***Lunapark*** service has only one command line switch `-c`, which points to a configuration file.
 
 *Example:*
 ```lua
@@ -123,37 +123,37 @@ The AMI role creates a global ***ami*** object, that allows execute an AMI comma
 
 	-- (String)
 	-- Path to the file that contains the processing logic
-	handler = '/etc/lunopark/handler.lua'
+	handler = '/etc/lunapark/handler.lua'
 
 	-- (String)
 	-- Log message identifier
-	ident = 'lunopark'
+	ident = 'lunapark'
 
 	-- (String)
 	-- Log file location
 	-- If not set then used only console output
-	log = '/tmp/lunopark.log'
+	log = '/tmp/lunapark.log'
 ```
 
 ### Usage
-To start the ***Lunopark*** service just need to specify the configuration file.
+To start the ***Lunapark*** service just need to specify the configuration file.
 
 ```sh
-	lunopark -c /etc/lunopark/lunopark.conf
+	lunapark -c /etc/lunapark/lunapark.conf
 ```
-If configuration file not specifyed then will be used default values, also ***Lunopark*** has't background mode, if you need to run in background mode uses the capabilities of the command shell.
+If configuration file not specifyed then will be used default values, also ***Lunapark*** has't background mode, if you need to run in background mode uses the capabilities of the command shell.
 ```sh
-	lunopark -c /etc/lunopark/lunopark.conf &>/dev/null &
+	lunapark -c /etc/lunapark/lunapark.conf &>/dev/null &
 ```
 
-The ***Lunopark*** can accepted the `HUP` and `QUIT` signals. When a `HUP`/`QUIT` is received, then ***Lunopark*** re-load a handler file.
+The ***Lunapark*** can accepted the `HUP` and `QUIT` signals. When a `HUP`/`QUIT` is received, then ***Lunapark*** re-load a handler file.
 
 ### Installation
-To install ***Lunopark*** use `git clone` and manually resolve the dependencies.
+To install ***Lunapark*** use `git clone` and manually resolve the dependencies.
 
 ```sh
-	mkdir -p /etc/lunopark && cd /etc/lunopark
-	git clone https://github.com/mzujev/lunopark
+	mkdir -p /etc/lunapark && cd /etc/lunapark
+	git clone https://github.com/mzujev/lunapark
 ```
 
 ### Dependencies
@@ -165,4 +165,4 @@ To install ***Lunopark*** use `git clone` and manually resolve the dependencies.
 - [md5](https://github.com/keplerproject/md5) - MD5 algorithm implementation
 
 ### Copyright
-See [Copyright.txt](https://github.com/mzujev/lunopark/blob/master/Copyright.txt) file for details
+See [Copyright.txt](https://github.com/mzujev/lunapark/blob/master/Copyright.txt) file for details

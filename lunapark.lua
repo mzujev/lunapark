@@ -766,7 +766,7 @@ if agi then
 end
 
 -- If valid AMI session and Role allowed
-if ami['socket'] then
+if ami and ami['socket'] then
 	-- Event-driven loop on AMI socket
 	io.new(event_occurred,ami.socket:getfd(),ev.READ):start(kernel)
 end
