@@ -43,106 +43,106 @@ local wait_reply = function(self)
 	-- Table which will contains future reply 
 	local buff = {}
 	-- Do not use get_connection, because we are waiting reply from allready connected server
-  local sock = self.socket
-  if not sock then
-    return self.logger("not connected")
-  end
+	local sock = self.socket
+	if not sock then
+		return self.logger("not connected")
+	end
 
 	-- Waiting until timeout/error occured or incoming data ended
-  while true do
-    -- read one line
-    local line, err = sock:receive()
+	while true do
+		-- read one line
+		local line, err = sock:receive()
 		-- Some error on socket
-    if not line then
-      return self.logger(err)
-    end
+		if not line then
+			return self.logger(err)
+		end
 		-- Empty line, that meens end of sequence
-    if #line == 0 then
-      return buff -- Just return reply buffer
-    end
+		if #line == 0 then
+			return buff -- Just return reply buffer
+		end
 		-- Parse incoming line
-    local key, val = line:match("^([^:]+)%s*:%s*(.*)$")
+		local key, val = line:match("^([^:]+)%s*:%s*(.*)$")
 		-- Parse is successed
-    if key then
+		if key then
 			-- That key allready exists
-      if buff[key] then
+			if buff[key] then
 				-- If exiats but not array
-        if type(buff[key]) ~= "table" then
-          buff[key] = { buff[key] } -- Transform to array
-        end
-        buff[key][#buff[key] + 1] = val -- Append value
-      else
-        buff[key] = val -- Key is does't exists, will adding him
-      end
-    else
+				if type(buff[key]) ~= "table" then
+					buff[key] = { buff[key] } -- Transform to array
+				end
+				buff[key][#buff[key] + 1] = val -- Append value
+			else
+				buff[key] = val -- Key is does't exists, will adding him
+			end
+		else
 			-- Error parsing line
-      return self.logger('Malformed line')
-    end
-  end
+			return self.logger('Malformed line')
+		end
+	end
 end
 
 -- Simple parse of the reply
 local parse_reply = function(response, field)
 	-- What we searches whithin response
-  field = field or "Message"
+	field = field or "Message"
 	-- Prepare the response 
 	response = type(response) ~= "table" and {tostring(response)} or response
 	-- Checking if response successed
-  if response and response['Response'] == "Success" then
+	if response and response['Response'] == "Success" then
 		-- Search field
-    if response[field] then
-      return tostring(response[field]) -- Field found
-    else
-      return debugger(table.concat {"Reply structure miss required field: ",tostring(field)}) -- Not
-    end
+		if response[field] then
+			return tostring(response[field]) -- Field found
+		else
+			return debugger(table.concat {"Reply structure miss required field: ",tostring(field)}) -- Not
+		end
 	else -- Unknown AMI response structure or it's not success
-    return debugger(tostring(response['Message']) or "Unknown AMI response structure")
-  end
+		return debugger(tostring(response['Message']) or "Unknown AMI response structure")
+	end
 	-- Just in case
-  return debugger("Malformed reply")
+	return debugger("Malformed reply")
 end
 
 -- Challenge login implementation
 local function challenge_login(conn, user, secret)
 	-- Trying send challenge
-  local stat, err = conn:command("Challenge", { AuthType = "md5" })
+	local stat, err = conn:command("Challenge", { AuthType = "md5" })
 	-- Checking if error occured
-  if not stat then
-    return conn.logger("AMI: Can't get challenge:" .. err)
-  end
+	if not stat then
+		return conn.logger("AMI: Can't get challenge:" .. err)
+	end
 	-- Wait reply
-  stat, err  = conn:wait_reply()
-  if not stat then
-    return conn.logger(err)
-  end
-  -- Search challenge sequence
+	stat, err	= conn:wait_reply()
+	if not stat then
+		return conn.logger(err)
+	end
+	-- Search challenge sequence
 	parse_reply(stat, "Challenge")
 	-- If found
-  if stat and stat['Challenge'] then
+	if stat and stat['Challenge'] then
 		-- Login command
-    stat, err = conn:command(
-        "Login",
-        {
-          AuthType = "md5",
-          Username = user,
-          Key = md5.sumhexa(table.concat({stat.Challenge,secret}))
-        }
-      )
+		stat, err = conn:command(
+				"Login",
+				{
+					AuthType = "md5",
+					Username = user,
+					Key = md5.sumhexa(table.concat({stat.Challenge,secret}))
+				}
+		)
 		-- Checking reply
-    if stat then
-      stat, err  = conn:wait_reply()
-      if stat then
-        return parse_reply(stat)
-      end
-    end
-  end
-  return conn.logger(err)
+		if stat then
+			stat, err	= conn:wait_reply()
+			if stat then
+				return parse_reply(stat)
+			end
+		end
+	end
+	return conn.logger(err)
 end
 
 -- Plain text login implementation
 local plain_login = function(conn, user, secret)
 	-- Login command
-  local stat, err = conn:command(
+	local stat, err = conn:command(
 		"Login",
 		{
 		  Username = user,
@@ -150,16 +150,16 @@ local plain_login = function(conn, user, secret)
 		}
 	)
 	-- Check error
-  if not stat then
-    return conn.logger(err)
-  end
+	if not stat then
+		return conn.logger(err)
+	end
 	-- Check reply
-  stat, err = conn:wait_reply()
-  if not stat then
-    return conn.logger(err) -- Something going wrong
-  end
+	stat, err = conn:wait_reply()
+	if not stat then
+		return conn.logger(err) -- Something going wrong
+	end
 	-- Parsing reply
-  return parse_reply(stat)
+	return parse_reply(stat)
 end
 
 -- Close current connection if any
@@ -180,52 +180,52 @@ end
 -- Make tcp connection
 local function make_connection(self)
 	-- Create simple TCP socket
-  local sock, err = socket.tcp()
+	local sock, err = socket.tcp()
 
 	-- If socket.tcp() fails, return nil and an error message
-  if not sock then
-    return self.logger(err)
-  end
+	if not sock then
+		return self.logger(err)
+	end
 
-  sock:settimeout(self['timeout'] or 1)
+	sock:settimeout(self['timeout'] or 1)
 
 	-- Connect to AMI server
-  stat, err = sock:connect(self['host'] or '127.0.0.1', self['port'] or 5038)
+	stat, err = sock:connect(self['host'] or '127.0.0.1', self['port'] or 5038)
 
 	-- If socket:connect() fails, return nil and an error message
-  if not stat then
-    return self.logger(err)
-  end
+	if not stat then
+		return self.logger(err)
+	end
 
-  -- Trying Receive banner line
-  line, err = sock:receive()
+	-- Trying Receive banner line
+	line, err = sock:receive()
 
 	-- If error occured, then does as usual ...
-  if err then
-    return self.logger(err)
-  end
+	if err then
+		return self.logger(err)
+	end
 	
 	protocol_version = string.lower(line):match( "^asterisk call manager/(%d.%d)")
 
 	-- Unknown signature
-  if not protocol_version then
-    sock:close()
-    return self.logger(string.format("bad signature: %s",line))
-  end
+	if not protocol_version then
+		sock:close()
+		return self.logger(string.format("bad signature: %s",line))
+	end
 
-  self.socket = sock
-  self.protocol_version = protocol_version
+	self.socket = sock
+	self.protocol_version = protocol_version
 end
 
 
 -- Connect to AMI socket (if not connected)
 local get_connection = function(self)
 	-- Connection is not establish yet
-  if not self.socket then
-    make_connection(self) -- Trying connect to server
-  end
+	if not self.socket then
+		make_connection(self) -- Trying connect to server
+	end
 	-- Return established connection if any
-  return self.socket
+	return self.socket
 end
 
 -- Execute AMI command
@@ -234,23 +234,23 @@ local function command(self, action, data)
 	local packet
 	data = type(data) == "table" and data or {data}
 	-- Get established connection or make if not connected yet
-  local sock, err = get_connection(self)
+	local sock, err = get_connection(self)
 	-- Return error message if any
-  if not sock then
-    return self.logger(err)
-  end
+	if not sock then
+		return self.logger(err)
+	end
 
-  packet = {string.format("Action:%s",action)}
+	packet = {string.format("Action:%s",action)}
 
-  for k, v in pairs(data) do
-    packet[#packet + 1] = string.format("%s:%s",k,v)
-  end
+	for k, v in pairs(data) do
+		packet[#packet + 1] = string.format("%s:%s",k,v)
+	end
 
-  packet = string.format("%s\n\n",table.concat(packet, "\n"))
-  return ltn12.pump.all(
-      ltn12.source.string(packet),
-      socket.sink("keep-open", sock)
-    )
+	packet = string.format("%s\n\n",table.concat(packet, "\n"))
+	return ltn12.pump.all(
+			ltn12.source.string(packet),
+			socket.sink("keep-open", sock)
+	)
 end
 
 -- Create a low-level connection object
@@ -275,20 +275,20 @@ local ami_connection = function(host, port, timeout, logger)
 	end
 
 	-- Return connection object
-  return {
-    -- methods
-    get_connection = get_connection,
+	return {
+		-- methods
+		get_connection = get_connection,
 		wait_reply = wait_reply,
-    command = command,
+		command = command,
 		logger = debugger,
-    close = close,
-    -- fields
-    protocol_version = nil,
-    timeout = timeout,
-    socket = nil,
-    host = host,
-    port = port
-  }
+		close = close,
+		-- fields
+		protocol_version = nil,
+		timeout = timeout,
+		socket = nil,
+		host = host,
+		port = port
+	}
 end
 
 local AMI = setmetatable({},{
@@ -367,12 +367,13 @@ end
 
 
 -- Add event-listener many at once
--- Syntax like: ami:addEvents({
---			'event1'=function()
---			end,
---			...
---			'event2'=function()
---			end
+-- Syntax like:
+--	ami:addEvents({
+--		'event1'=function()
+--		end,
+--		...
+--		'event2'=function()
+--		end
 --	})
 --	event: Event name(Newchannel,Hangup, Answer, etc)
 --	function: Callback function that will be executed when an event occurs
